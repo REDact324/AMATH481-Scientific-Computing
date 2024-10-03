@@ -22,13 +22,16 @@ A2 = []
 A3 = [0, 0]
 
 # Newton-Raphson method
-count = 1
+count = 0
 
-while np.abs(function(A1[-1])) > 1e-6:
+while count < 1000:
   x_ini = A1[-1]
   x_new = x_ini - (function(x_ini) / diff_function(x_ini))
   A1.append(x_new)
   count += 1
+  if np.abs(x_new - x_ini) <= 1e-6:
+    break
+
 
 A3[0] = count
 
@@ -66,11 +69,11 @@ y = np.array([[0], [1]])
 z = np.array([[1], [2], [-1]])
 
 A4 = np.ndarray.tolist(A + B)
-A5 = np.ndarray.tolist(3 * x - 4 * y)
-A6 = np.ndarray.tolist(np.matmul(A, x))
-A7 = np.ndarray.tolist(np.matmul(B, (x - y)))
-A8 = np.ndarray.tolist(np.matmul(D, x))
-A9 = np.ndarray.tolist(np.matmul(D, y) + z)
+A5 = np.ndarray.tolist((3 * x - 4 * y).reshape(-1))
+A6 = np.ndarray.tolist((np.matmul(A, x)).reshape(-1))
+A7 = np.ndarray.tolist((np.matmul(B, (x - y))).reshape(-1))
+A8 = np.ndarray.tolist((np.matmul(D, x)).reshape(-1))
+A9 = np.ndarray.tolist((np.matmul(D, y) + z).reshape(-1))
 A10 = np.ndarray.tolist(np.matmul(A, B))
 A11 = np.ndarray.tolist(np.matmul(B, C))
 A12 = np.ndarray.tolist(np.matmul(C, D))
