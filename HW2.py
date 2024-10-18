@@ -1,68 +1,61 @@
 import numpy as np
-from scipy.integrate import solve_bvp
-import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
 
-L = 4
-xspan = np.arange(-L, L+0.1, 0.1)
-K = 1
-n_eigenfunctions = 5 # number of eignfunctions
+def bvpfunc(x, y, k, eps):
+    f1 = y[1]
+    f2 = (k * x**2 - eps) * y[0]
+    dydt = np.array([f1, f2])
+    return dydt
 
-eigenvalues = []
-eigenfunctions = []
+# Manual trapezoidal integration function
+def manual_trapz(y_values, x_values):
+    # Calculate the integral using the trapezoidal rule
+    integral = 0.0
+    for i in range(len(x_values) - 1):
+        h = x_values[i+1] - x_values[i]  # Calculate the width of the trapezoid
+        integral += 0.5 * h * (y_values[i] + y_values[i+1])  # Area of the trapezoid
+    return integral
 
-# Define the differential equation system
-def schrodinger_equation(x, y, eps):
-    """
-    Returns the system of equations representing the Schrodinger equation.
-    y[0] = ϕ, dy[1]/dx = d2ϕ/dx2
-    eps = eigenvalue parameter (epsilon_n)
-    """
-    return np.vstack([y[1], (K * x**2 - eps) * y[0]])
+# Parameters
+eps_start = 0
+eps = eps_start
+xspan = np.arange(-4, 4.1, 0.1)
+tol = 1e-4
+k = 1
 
-def boundary_conditions(ya, yb, eps):
-    """
-    Boundary conditions: We want the wave function to vanish at both ends (ya, yb).
-    """
-    return np.array([ya[0], ya[1] - 0.1,yb[0]])
+eig_val1 = []
+eig_vec1 = []
 
-# Initial guess for the eigenfunctions
-def initial_guess(x):
-    """
-    Provide an initial guess for the shooting method.
-    """
-    return np.vstack([np.exp(-x**2), -2*x*np.exp(-x**2)])
+for mode in range(1, 6):
+    eps = eps_start
+    deps = 0.1
 
-for n in range(n_eigenfunctions):
-    # Initial guess for the eigenvalue (epsilon_n)
-    eps_guess = n * 2 + 1  # Rough estimate for eigenvalues (for n-th eigenstate)
+    for i in range(1000):
+        # Solve the ODE
+        sol = solve_ivp(lambda x, y: bvpfunc(x, y, k, eps), [xspan[0], xspan[-1]], [1, np.sqrt(16 - eps)], t_eval=xspan)
+        x = sol.t
+        y = sol.y
 
-    # Solve boundary value problem for each eigenvalue
-    solution = solve_bvp(schrodinger_equation,
-                         boundary_conditions, xspan, initial_guess(xspan), p=[eps_guess])
+        # Boundary condition check
+        temp = y[1, -1] + np.sqrt(16 - eps) * y[0, -1]
 
-    # Store the results
-    eigenvalues.append(solution.p[0])  # eps (eigenvalue)
-    eigenfunctions.append(solution.sol(xspan)[0])  # ϕn (eigenfunction)
+        if abs(temp) < tol:
+            eig_val1.append(eps)
+            # Calculate the norm using the custom trapezoidal integration function
+            integral = manual_trapz(y[0, :]**2, x)
+            y_norm = y[0, :] / np.sqrt(integral)  # Normalize y using the computed integral
+            eig_vec1.append(np.abs(y_norm))
+            break
 
-# Convert to numpy arrays for easier manipulation
-eigenvalues = np.array(eigenvalues)
-eigenfunctions = np.array(eigenfunctions)
+        if (-1)**(mode + 1) * temp > 0:
+            eps += deps
+        else:
+            eps -= deps / 2
+            deps /= 2
 
-# Normalize the eigenfunctions
-for i in range(len(eigenfunctions)):
-    eigenfunctions[i] /= np.sqrt(np.trapz(np.abs(eigenfunctions[i])**2, xspan))
+    eps_start = eps + 0.1
 
-# Save the eigenfunctions and eigenvalues
-A1 = np.abs(eigenfunctions).T  # Transpose to get 5 columns (one for each eigenfunction)
-A2 = eigenvalues
-
-# Display or save results
-print("Eigenvalues (εn):", A2)
-for i in range(n_eigenfunctions):
-    plt.plot(xspan, A1[:, i], label=f'ϕ{i+1}(x)')
-
-plt.title("First 5 Eigenfunctions of Quantum Harmonic Oscillator")
-plt.xlabel("x")
-plt.ylabel("|ϕn(x)|")
-plt.legend()
-plt.show()
+# Extracting eigenvectors and eigenvalues
+A1 = np.array(eig_vec1).T
+A1 = A1.tolist()
+A2 = eig_val1
