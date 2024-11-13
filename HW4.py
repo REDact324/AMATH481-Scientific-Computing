@@ -25,7 +25,7 @@ diagonals = [e1.flatten(), e1.flatten(), e5.flatten(),
 e2.flatten(), -4 * e1.flatten(), e3.flatten(),
 e4.flatten(), e1.flatten(), e1.flatten()]
 offsets = [-(n-m), -m, -m+1, -1, 0, 1, m-1, m, (n-m)]
-A = (1/(dx**2))*spdiags(diagonals, offsets, n, n).toarray()
+A1 = (1/(dx**2))*spdiags(diagonals, offsets, n, n).toarray()
 
 # MATRIX B
 e1 = np.ones((n, 1))
@@ -36,7 +36,7 @@ e4 = np.ones((n,1))
 diagonals = [e1.flatten(), -e2.flatten(), e3.flatten(), -e4.flatten()]
 offsets = [(-n+m), -m, m, n-m]
 B = spdiags(diagonals, offsets, n, n,).toarray()
-B = B/(2*dx)
+A2 = B/(2*dx)
 
 # MATRIX C
 e1 = np.zeros((n, 1))
@@ -52,7 +52,7 @@ for index in range(8):
 diagonals = [e1.flatten(), -e2.flatten(), e3.flatten(), -e4.flatten()]
 offsets = [(-m+1), -1, 1, m-1]
 C = spdiags(diagonals, offsets, n, n,).toarray()
-C = C/(2*dy)
+A3 = C/(2*dy)
 
 # Output the matrices
 print("Matrix A1 (Second Derivative):")
