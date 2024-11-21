@@ -5,7 +5,7 @@ from scipy.fftpack import fft2, ifft2
 from scipy.integrate import solve_ivp
 from scipy.linalg import lu, solve_triangular
 from scipy.sparse.linalg import bicgstab, gmres
-from scipy.sparse import spdiags
+from scipy.sparse import spdiags, csr_matrix
 import time
 
 
@@ -167,7 +167,7 @@ plt.show(anim)
 
 ############## b2 ##############
 
-start_time = time.time ()  # 记录时间
+start_time = time.time ()
 
 P, L, U = lu(A)
 
@@ -194,7 +194,7 @@ print (f"Elapsed time for LU: {(end_time - start_time):.2f} seconds")
 A3 = sol.y
 
 # Movie time :P
-plot = A2.copy()
+plot = A3.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
@@ -213,3 +213,94 @@ def update (frame):
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
 # anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/LU.gif', writer='imagemagick', fps=2)
+
+############## BICGSTAB ##############
+
+A_csr = csr_matrix(A)
+
+
+def bicgstab_rhs (t, w, A, B, C, nu):
+    psi, info = bicgstab(A_csr, w, atol=1e-8, maxiter=1000)
+
+    rhs = (
+            nu * A.dot(w)  # nu * A * w
+            + (B.dot(w)) * (C.dot(psi))
+            - (B.dot(psi)) * (C.dot(w))
+    )
+
+    return rhs
+
+
+start_time = time.time ()
+
+sol = solve_ivp(lambda t, w: bicgstab_rhs(t, w, A, B, C, nu), (tspan[0], tspan[-1]), w0, t_eval=tspan, method='RK45')
+
+end_time = time.time ()
+print (f"Elapsed time for BICGSTAB: {(end_time - start_time):.2f} seconds")
+
+BGB = sol.y
+
+# Movie time :P
+plot = BGB.copy()
+n = int(np.sqrt(plot.shape[0]))
+
+fig, ax = plt.subplots(figsize=(6, 6))
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+fig.colorbar (cax, ax=ax, label='V')
+ax.set_title ('LU')
+ax.set_xlabel ('x')
+ax.set_ylabel ('y')
+
+def update (frame):
+    ax.set_title(f'V Field at t = {frame * 0.5:.2f}')
+    cax.set_data(plot[:, frame].reshape ((n, n)))
+    return cax,
+
+
+anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
+plt.show(anim)
+# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/BICGSTAB.gif', writer='imagemagick', fps=2)
+
+################ GMRES ################
+
+def gmres_rhs(t, w, A, B, C, nu):
+    psi, info = gmres(A_csr, w, atol=1e-8, restart=50, maxiter=1000)
+
+    rhs = (
+            nu * A.dot(w)
+            + (B.dot(w)) * (C.dot(psi))
+            - (B.dot(psi)) * (C.dot(w))
+    )
+
+    return rhs
+
+
+start_time = time.time()
+
+sol = solve_ivp(lambda t, w: gmres_rhs(t, w, A, B, C, nu), (tspan[0], tspan[-1]), w0, t_eval=tspan, method='RK45')
+
+end_time = time.time()
+print(f"Elapsed time for GMRES: {(end_time - start_time):.2f} seconds")
+
+GMRES = sol.y
+
+# Movie time :P
+plot = GMRES.copy()
+n = int(np.sqrt(plot.shape[0]))
+
+fig, ax = plt.subplots(figsize=(6, 6))
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+fig.colorbar (cax, ax=ax, label='V')
+ax.set_title ('LU')
+ax.set_xlabel ('x')
+ax.set_ylabel ('y')
+
+def update (frame):
+    ax.set_title(f'V Field at t = {frame * 0.5:.2f}')
+    cax.set_data(plot[:, frame].reshape ((n, n)))
+    return cax,
+
+
+anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
+plt.show(anim)
+# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/GMRES.gif', writer='imagemagick', fps=2)
