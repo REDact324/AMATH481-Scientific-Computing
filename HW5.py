@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from scipy.fftpack import fft2, ifft2
 from scipy.integrate import solve_ivp
 from scipy.linalg import lu, solve_triangular
@@ -8,6 +9,8 @@ from scipy.sparse.linalg import bicgstab, gmres
 from scipy.sparse import spdiags, csr_matrix
 import time
 
+colors = ["#0D0D0D", "#B33527", "#F9B72E", "#E4E2E3", "#66CEC8", "#274966"]
+cmap = LinearSegmentedColormap.from_list('mycmap', colors)
 
 dx = 20/64
 dy = 20/64
@@ -106,7 +109,7 @@ plot = A1.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
-cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
 fig.colorbar (cax, ax=ax, label='V')
 ax.set_title ('FFT')
 ax.set_xlabel ('x')
@@ -120,7 +123,7 @@ def update (frame):
 
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
-# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/FFT.gif', writer='imagemagick', fps=2)
+anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/FFT.gif', writer='imagemagick', fps=2)
 
 ############### b1 ################
 
@@ -149,7 +152,7 @@ plot = A2.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
-cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
 fig.colorbar (cax, ax=ax, label='V')
 ax.set_title ('A/b')
 ax.set_xlabel ('x')
@@ -163,7 +166,7 @@ def update (frame):
 
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
-# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/A_b.gif', writer='imagemagick', fps=2)
+anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/A_b.gif', writer='imagemagick', fps=2)
 
 ############## b2 ##############
 
@@ -198,7 +201,7 @@ plot = A3.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
-cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
 fig.colorbar (cax, ax=ax, label='V')
 ax.set_title ('LU')
 ax.set_xlabel ('x')
@@ -212,7 +215,7 @@ def update (frame):
 
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
-# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/LU.gif', writer='imagemagick', fps=2)
+anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/LU.gif', writer='imagemagick', fps=2)
 
 ############## BICGSTAB ##############
 
@@ -245,7 +248,7 @@ plot = BGB.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
-cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
 fig.colorbar (cax, ax=ax, label='V')
 ax.set_title ('LU')
 ax.set_xlabel ('x')
@@ -259,7 +262,7 @@ def update (frame):
 
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
-# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/BICGSTAB.gif', writer='imagemagick', fps=2)
+anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/BICGSTAB.gif', writer='imagemagick', fps=2)
 
 ################ GMRES ################
 
@@ -289,7 +292,7 @@ plot = GMRES.copy()
 n = int(np.sqrt(plot.shape[0]))
 
 fig, ax = plt.subplots(figsize=(6, 6))
-cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap='jet')
+cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
 fig.colorbar (cax, ax=ax, label='V')
 ax.set_title ('LU')
 ax.set_xlabel ('x')
@@ -303,4 +306,4 @@ def update (frame):
 
 anim = FuncAnimation(fig, update, frames=plot.shape[1], blit=True)
 plt.show(anim)
-# anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/GMRES.gif', writer='imagemagick', fps=2)
+anim.save ('/Users/dongyueqi/Documents/Undergraduate/4Y/Fall/AMATH481/AMATH481-Homework/HW5-movie/GMRES.gif', writer='imagemagick', fps=2)
