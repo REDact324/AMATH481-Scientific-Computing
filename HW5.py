@@ -383,7 +383,7 @@ change_initial('FFT(Opposite_collide).gif', 1 * np.exp(-(X-5) ** 2 - ((Y-5) ** 2
 
 # A random assortment (in position, strength, charge, ellipticity, etc.) of vorticies on the periodic domain. Try 10-15 vorticies and watch what happens.
 # Random assortment of vortices
-np.random.seed(42)  # For reproducibility
+# np.random.seed(324)  # For reproducibility
 num_vortices = 15
 w4 = np.zeros_like(X)
 
