@@ -353,7 +353,7 @@ def change_initial(save_file_name, omega_equ):
     plot = wsol.copy()
     n = int(np.sqrt(plot.shape[0]))
 
-    fig, ax = plt.subplots(figsize=(10,8), dpi=300)
+    fig, ax = plt.subplots(figsize=(6, 6))
     cax = ax.imshow (plot[:, 0].reshape((n, n)), extent=[-10, 10, -10, 10], cmap=cmap)
     fig.colorbar (cax, ax=ax, label='V')
     ax.set_title ('FFT')
@@ -367,7 +367,7 @@ def change_initial(save_file_name, omega_equ):
 
     anim = FuncAnimation(fig=fig, func=update, frames=len(tspan), interval=200, blit=True)
     plt.show(anim)
-    anim.save ('./HW5-movie/'+save_file_name, writer='imagemagick', fps=2)
+    # anim.save ('./HW5-movie/'+save_file_name, writer='imagemagick', fps=2)
     plt.close()
 
 # Two oppositely “charged” Gaussian vorticies next to each other, i.e. one with positive amplitude, the other with negative amplitude.
