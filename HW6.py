@@ -11,7 +11,6 @@ beta = 1
 D1 = 0.1
 D2 = D1
 
-# 定义参数
 L = 20
 n = 64
 beta = 1
@@ -69,11 +68,8 @@ def rhs (t, Z):
     rhs = np.concatenate ([dUdt_hat.flatten (), dVdt_hat.flatten ()])
     return rhs
 
-
-# 初始化（保留频域表示）
 Z0 = np.concatenate ([fft2 (U0).flatten (), fft2 (V0).flatten ()])
 
-# 数值求解
 sol = solve_ivp (rhs, (t_span[0], t_span[-1]), Z0, t_eval=t_span, method='RK45')
 
 A1 = sol.y
@@ -138,18 +134,14 @@ def omega_A (U, V):
     return -beta * A2
 
 
-# 定义 rhs
 def rhs (t, uv_t):
     n_rhs = n + 1
 
-    # 提取 U 和 V
     ut, vt = uv_t[:n_rhs ** 2], uv_t[n_rhs ** 2:]
 
-    # 反应项
     dUdt = (lambda_A (ut, vt) * ut - omega_A (ut, vt) * vt) + D1 * (L @ ut)
     dVdt = (omega_A (ut, vt) * ut + lambda_A (ut, vt) * vt) + D2 * (L @ vt)
 
-    # 将结果展平以适应 solve_ivp
     return np.concatenate ([dUdt, dVdt])
 
 
